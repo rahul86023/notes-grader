@@ -7,9 +7,12 @@ const classSchema = new mongoose.Schema({
   },
   teacher: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User", // Reference to the teacher (User model)
+    ref: "User",
     required: true,
   },
+  assignments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Assignment" }], // Add this line
+  students: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  enrollmentRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 });
 
 const Class = mongoose.model("Class", classSchema);

@@ -11,9 +11,6 @@ const { validationResult } = require("express-validator");
 // User model import
 const User = require("../models/user");
 
-// @route   POST /users/login
-// @desc    Authenticate user and generate JWT token
-// @access  Public
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -52,7 +49,7 @@ router.post("/login", async (req, res) => {
 router.post(
   "/register",
 
-  //registerValidator,
+  registerValidator,
   async (req, res, next) => {
     try {
       const errors = validationResult(req);

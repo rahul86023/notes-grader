@@ -21,6 +21,8 @@ const UserSchema = new mongoose.Schema({
     enum: ["student", "teacher"],
     required: true,
   },
+  enrolledClasses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Class" }],
+  enrollmentRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: "Class" }],
 });
 
 UserSchema.pre("save", async function (next) {
@@ -44,5 +46,5 @@ UserSchema.methods.isValidPassword = async function (password) {
   }
 };
 
-const User = mongoose.model("user", UserSchema);
+const User = mongoose.model("User", UserSchema);
 module.exports = User;

@@ -32,6 +32,7 @@ connectToDatabase();
 app.use(express.json());
 //routes
 app.use("/api/v0", require("./routes/auth"));
+app.use("/api/v0", require("./routes/protectedRoutes"));
 // Passport Middleware
 app.use(passport.initialize());
 
