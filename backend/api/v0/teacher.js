@@ -1,5 +1,6 @@
 const Assignment = require("../../models/assignment");
 const Class = require("../../models/class");
+const Submission = require("../../models/submission");
 const User = require("../../models/user");
 
 // API to retrieve the teacher's dashboard
@@ -21,11 +22,11 @@ const dashboard = async (req, res) => {
       .populate("assignments")
       .populate("students", "name");
 
-    // Find enrollment requests for the teacher's classes
+    // Find enrollment requests from students for the teacher's classes
     const enrollmentRequests = await Class.find({
       teacher: teacherId,
-      enrollmentRequests: { $exists: true, $not: { $size: 0 } },
-    }).populate("enrollmentRequests", "name");
+      enrollmentRequestsFromStudents: { $exists: true, $not: { $size: 0 } },
+    }).populate("enrollmentRequestsFromStudents", "name");
 
     const teacherDashboard = {
       classes,
@@ -94,6 +95,7 @@ const assignAssignment = async (req, res) => {
 
     res.json({ message: "Assignment assigned to the class successfully" });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
@@ -131,6 +133,7 @@ const viewAssignments = async (req, res) => {
 
     res.json(classDetails);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
@@ -165,8 +168,8 @@ const enrollmentRequests = async (req, res) => {
     // Find classes taught by the teacher with enrollment requests
     const classesWithRequests = await Class.find({
       teacher: teacherId,
-      enrollmentRequests: { $exists: true, $not: { $size: 0 } },
-    }).populate("enrollmentRequests", "name");
+      enrollmentRequestsFromStudents: { $exists: true, $not: { $size: 0 } },
+    }).populate("enrollmentRequestsFromStudents", "name");
 
     res.json(classesWithRequests);
   } catch (error) {
@@ -193,7 +196,7 @@ const approveOrRejectEnrollment = async (req, res) => {
     }
 
     // Check if the student is in the enrollment requests list
-    if (!existingClass.enrollmentRequests.includes(studentId)) {
+    if (!existingClass.enrollmentRequestsFromStudents.includes(studentId)) {
       return res
         .status(400)
         .json({ error: "Student not in enrollment requests" });
@@ -204,16 +207,17 @@ const approveOrRejectEnrollment = async (req, res) => {
       // Add the student to the class's students list
       existingClass.students.push(studentId);
       // Remove the student from the enrollment requests list
-      existingClass.enrollmentRequests.pull(studentId);
+      existingClass.enrollmentRequestsFromStudents.pull(studentId);
     } else {
       // Reject the enrollment request
-      existingClass.enrollmentRequests.pull(studentId);
+      existingClass.enrollmentRequestsFromStudents.pull(studentId);
     }
 
     await existingClass.save();
 
     res.json({ message: "Enrollment request processed successfully" });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: "Internal server error" });
   }
 };

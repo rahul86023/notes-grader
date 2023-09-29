@@ -22,7 +22,9 @@ const UserSchema = new mongoose.Schema({
     required: true,
   },
   enrolledClasses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Class" }],
-  enrollmentRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: "Class" }],
+  requestedEnrollments: [
+    { type: mongoose.Schema.Types.ObjectId, ref: "Class" },
+  ],
 });
 
 UserSchema.pre("save", async function (next) {

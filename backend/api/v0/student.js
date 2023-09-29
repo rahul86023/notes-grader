@@ -31,7 +31,8 @@ const allClassesList = async (req, res) => {
 // API to request enrollment in a class (Student)
 const requestClassEnrollment = async (req, res) => {
   try {
-    const { classId } = req.params;
+    console.log(req.body, "req body");
+    const { classId } = req.body;
     const studentId = req.user._id;
 
     // Check if the class exists
@@ -44,7 +45,7 @@ const requestClassEnrollment = async (req, res) => {
     const student = await User.findById(studentId);
     if (
       student.enrolledClasses.includes(classId) ||
-      student.enrollmentRequests.includes(classId)
+      student.requestedEnrollments.includes(classId)
     ) {
       return res.status(400).json({
         error: "Student is already enrolled or has a pending request",
@@ -52,8 +53,11 @@ const requestClassEnrollment = async (req, res) => {
     }
 
     // Add the class to the student's enrollment requests
-    student.enrollmentRequests.push(classId);
+    student.requestedEnrollments.push(classId);
     await student.save();
+    // Add the student to the class's enrollmentRequestsFromStudents
+    classExists.enrollmentRequestsFromStudents.push(studentId);
+    await classExists.save();
 
     res.json({ message: "Enrollment request sent successfully" });
   } catch (error) {
@@ -92,6 +96,7 @@ const submitAssignment = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
 module.exports = {
   allClassesList,
   requestClassEnrollment,
